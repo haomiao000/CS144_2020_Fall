@@ -2,7 +2,7 @@
 #define SPONGE_LIBSPONGE_STREAM_REASSEMBLER_HH
 
 #include "byte_stream.hh"
-
+#include<set>
 #include <cstdint>
 #include <string>
 
@@ -14,6 +14,14 @@ class StreamReassembler {
 
     ByteStream _output;  //!< The reassembled in-order byte stream
     size_t _capacity;    //!< The maximum number of bytes
+    struct Element {
+        size_t pos;
+        char value;
+        bool operator<(const Element &b) const { return pos < b.pos; }
+    };
+    std::set<Element>reassembler_buf;
+    bool reassembler_if_end=false;
+    size_t reassembler_end_pos;
 
   public:
     //! \brief Construct a `StreamReassembler` that will store up to `capacity` bytes.
