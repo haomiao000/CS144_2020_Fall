@@ -15,6 +15,7 @@ using namespace std;
 StreamReassembler::StreamReassembler(const size_t capacity) : 
     _output(capacity), 
     _capacity(capacity), 
+    index_maxpos(0),
     reassembler_buf(),
     reassembler_if_end(false),
     reassembler_end_pos(0){
@@ -25,8 +26,9 @@ StreamReassembler::StreamReassembler(const size_t capacity) :
 //! contiguous substrings and writes them into the output stream in order.
 void StreamReassembler::push_substring(const string &data, const size_t index, const bool eof) {
     // cout<<data<<" "<<index<<" "<<eof<<endl;
-    size_t index_maxpos=_output.bytes_read()+_capacity-1;
+    index_maxpos=_output.bytes_read()+_capacity-1;
     size_t datalen=data.length();
+    // cout<<"datalen="<<datalen<<endl;
     if(index_maxpos<index){
         return;
     }
