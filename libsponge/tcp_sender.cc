@@ -90,6 +90,7 @@ void TCPSender::ack_received(const WrappingInt32 ackno, const uint16_t window_si
     // cout<<"ackstart-----------------ack="<<ackno.raw_value()<<endl;
     uint64_t nw_ack=unwrap(ackno , _isn , _ackno_now);
     // cout<<"nw_ack="<<nw_ack<<" ack_now="<<_ackno_now<<endl;
+    if(nw_ack>_next_seqno) return;
     if(nw_ack>_ackno_now){
         while(!_outgoing_seg.empty()&&_ackno_now+_outgoing_seg[0].length_in_sequence_space()<=nw_ack){
             // cout<<"pop()"<<endl;
