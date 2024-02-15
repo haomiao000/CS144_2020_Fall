@@ -14,7 +14,7 @@ using namespace std;
 int main() {
     try {
         auto rd = get_random_generator();
-
+        // cout<<"********************"<<endl;
         {
             TCPConfig cfg;
             WrappingInt32 isn(rd());
@@ -28,7 +28,7 @@ int main() {
             test.execute(ExpectSegment{}.with_no_flags().with_data("abcd"));
             test.execute(ExpectNoSegment{});
         }
-
+        // cout<<"********************"<<endl;
         {
             TCPConfig cfg;
             WrappingInt32 isn(rd());
@@ -42,7 +42,7 @@ int main() {
             test.execute(ExpectSegment{}.with_no_flags().with_data("abcdef"));
             test.execute(ExpectNoSegment{});
         }
-
+        // cout<<"********************"<<endl;
         {
             const size_t MIN_WIN = 5;
             const size_t MAX_WIN = 100;
@@ -62,7 +62,7 @@ int main() {
                 test.execute(ExpectNoSegment{});
             }
         }
-
+        // cout<<"********************"<<endl;    
         {
             TCPConfig cfg;
             WrappingInt32 isn(rd());
@@ -78,25 +78,34 @@ int main() {
             test.execute(ExpectSegment{}.with_no_flags().with_data("45678"));
             test.execute(ExpectNoSegment{});
         }
-
+        // cout<<"********************"<<endl;
         {
             TCPConfig cfg;
             WrappingInt32 isn(rd());
             cfg.fixed_isn = isn;
-
+            // cout<<"********************"<<endl;
             TCPSenderTestHarness test{"FIN flag occupies space in window", cfg};
             test.execute(ExpectSegment{}.with_no_flags().with_syn(true).with_payload_size(0).with_seqno(isn));
             test.execute(AckReceived{WrappingInt32{isn + 1}}.with_win(7));
+            // cout<<"********************"<<endl;
             test.execute(ExpectNoSegment{});
+            // cout<<"********************"<<endl;
             test.execute(WriteBytes{"1234567"});
+            // cout<<"********************"<<endl;
             test.execute(Close{});
+            // cout<<"********************"<<endl;
             test.execute(ExpectSegment{}.with_no_flags().with_data("1234567"));
+            // cout<<"********************"<<endl;
             test.execute(ExpectNoSegment{});  // window is full
+            // cout<<"********************"<<endl;
             test.execute(AckReceived{WrappingInt32{isn + 8}}.with_win(1));
+            // cout<<"********************"<<endl;
             test.execute(ExpectSegment{}.with_fin(true).with_data(""));
+            // cout<<"********************"<<endl;
             test.execute(ExpectNoSegment{});
+            // cout<<"********************"<<endl;
         }
-
+        // cout<<"********************"<<endl;
         {
             TCPConfig cfg;
             WrappingInt32 isn(rd());
@@ -114,7 +123,7 @@ int main() {
             test.execute(ExpectSegment{}.with_fin(true).with_data(""));
             test.execute(ExpectNoSegment{});
         }
-
+        // cout<<"********************"<<endl;
         {
             TCPConfig cfg;
             WrappingInt32 isn(rd());

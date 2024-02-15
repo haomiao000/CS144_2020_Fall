@@ -15,7 +15,7 @@ using namespace std;
 int main() {
     try {
         auto rd = get_random_generator();
-
+        // cout<<"********************"<<endl;
         {
             TCPConfig cfg;
             WrappingInt32 isn(rd());
@@ -31,25 +31,34 @@ int main() {
             test.execute(ExpectSegment{}.with_fin(true).with_seqno(isn + 1));
             test.execute(ExpectNoSegment{});
         }
-
+        // cout<<"********************"<<endl;
         {
             TCPConfig cfg;
             WrappingInt32 isn(rd());
             cfg.fixed_isn = isn;
 
             TCPSenderTestHarness test{"FIN acked test", cfg};
+            // cout<<"********************"<<endl;
             test.execute(ExpectSegment{}.with_no_flags().with_syn(true).with_payload_size(0).with_seqno(isn));
+            // cout<<"********************"<<endl;
             test.execute(AckReceived{WrappingInt32{isn + 1}});
             test.execute(ExpectState{TCPSenderStateSummary::SYN_ACKED});
+            // cout<<"********************"<<endl;
             test.execute(Close{});
+            // cout<<"********************"<<endl;         
             test.execute(ExpectState{TCPSenderStateSummary::FIN_SENT});
+            // cout<<"********************"<<endl;    
             test.execute(ExpectSegment{}.with_fin(true).with_seqno(isn + 1));
+            // cout<<"********************"<<endl;
             test.execute(AckReceived{WrappingInt32{isn + 2}});
+            // cout<<"********************"<<endl;
             test.execute(ExpectState{TCPSenderStateSummary::FIN_ACKED});
+            // cout<<"********************"<<endl;    
             test.execute(ExpectBytesInFlight{0});
+            // cout<<"********************"<<endl;
             test.execute(ExpectNoSegment{});
         }
-
+        // cout<<"********************"<<endl;
         {
             TCPConfig cfg;
             WrappingInt32 isn(rd());
@@ -67,7 +76,7 @@ int main() {
             test.execute(ExpectBytesInFlight{1});
             test.execute(ExpectNoSegment{});
         }
-
+        // cout<<"********************"<<endl;
         {
             TCPConfig cfg;
             WrappingInt32 isn(rd());
@@ -102,7 +111,7 @@ int main() {
             test.execute(ExpectBytesInFlight{0});
             test.execute(ExpectNoSegment{});
         }
-
+        // cout<<"********************"<<endl;
     } catch (const exception &e) {
         cerr << e.what() << endl;
         return 1;

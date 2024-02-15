@@ -59,9 +59,11 @@ inline std::ostream &operator<<(std::ostream &os, WrappingInt32 a) { return os <
 
 //! \brief The point `b` steps past `a`.
 inline WrappingInt32 operator+(WrappingInt32 a, uint32_t b) { return WrappingInt32{a.raw_value() + b}; }
+inline WrappingInt32 operator+(WrappingInt32 a, int b) { return WrappingInt32{a.raw_value() + b}; }
 
 //! \brief The point `b` steps before `a`.
 inline WrappingInt32 operator-(WrappingInt32 a, uint32_t b) { return a + -b; }
+inline WrappingInt32 operator-(WrappingInt32 a, int b) { return a + -b; }
 //!@}
 
 #endif  // SPONGE_LIBSPONGE_WRAPPING_INTEGERS_HH

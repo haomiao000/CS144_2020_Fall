@@ -14,31 +14,38 @@ using namespace std;
 int main() {
     try {
         auto rd = get_random_generator();
-
+        // cout<<"********************"<<endl;
         {
             TCPConfig cfg;
             WrappingInt32 isn(rd());
             const size_t rto = uniform_int_distribution<uint16_t>{30, 10000}(rd);
             cfg.fixed_isn = isn;
             cfg.rt_timeout = rto;
-
+            // cout<<"********************"<<endl;
             TCPSenderTestHarness test{"If already running, timer stays running when new segment sent", cfg};
-
+            // cout<<"********************"<<endl;
             test.execute(ExpectSegment{}.with_no_flags().with_syn(true).with_payload_size(0).with_seqno(isn));
             test.execute(AckReceived{WrappingInt32{isn + 1}}.with_win(1000));
             test.execute(ExpectState{TCPSenderStateSummary::SYN_ACKED});
+            // cout<<"********************"<<endl;
             test.execute(WriteBytes("abc"));
+            // cout<<"********************"<<endl;
             test.execute(ExpectSegment{}.with_payload_size(3).with_data("abc").with_seqno(isn + 1));
             test.execute(Tick{rto - 5});
+            // cout<<"********************"<<endl;
             test.execute(ExpectNoSegment{});
             test.execute(WriteBytes("def"));
+            // cout<<"********************"<<endl;
             test.execute(ExpectSegment{}.with_payload_size(3).with_data("def"));
             test.execute(Tick{6});
+            // cout<<"********************"<<endl;
             test.execute(ExpectSegment{}.with_payload_size(3).with_data("abc").with_seqno(isn + 1));
             test.execute(ExpectNoSegment{});
+            // cout<<"********************"<<endl;
         }
 
         {
+            // cout<<"********************"<<endl;
             TCPConfig cfg;
             WrappingInt32 isn(rd());
             const size_t rto = uniform_int_distribution<uint16_t>{30, 10000}(rd);
@@ -62,30 +69,38 @@ int main() {
         }
 
         {
+            // cout<<"********************"<<endl;
             TCPConfig cfg;
             WrappingInt32 isn(rd());
             const size_t rto = uniform_int_distribution<uint16_t>{30, 10000}(rd);
             cfg.fixed_isn = isn;
             cfg.rt_timeout = rto;
-
+            // cout<<"********************"<<endl;
             TCPSenderTestHarness test{"Timer restarts on ACK of new data", cfg};
 
             test.execute(ExpectSegment{}.with_no_flags().with_syn(true).with_payload_size(0).with_seqno(isn));
             test.execute(AckReceived{WrappingInt32{isn + 1}}.with_win(1000));
             test.execute(ExpectState{TCPSenderStateSummary::SYN_ACKED});
             test.execute(WriteBytes("abc"));
+            // cout<<"********************"<<endl;
             test.execute(ExpectSegment{}.with_payload_size(3).with_data("abc").with_seqno(isn + 1));
             test.execute(Tick{rto - 5});
+            // cout<<"********************"<<endl;
             test.execute(WriteBytes("def"));
             test.execute(ExpectSegment{}.with_payload_size(3).with_data("def").with_seqno(isn + 4));
             test.execute(AckReceived{WrappingInt32{isn + 4}}.with_win(1000));
             test.execute(Tick{rto - 1});
+            // cout<<"********************"<<endl;
             test.execute(ExpectNoSegment{});
+            // cout<<"********************"<<endl;
             test.execute(Tick{2});
+            // cout<<"********************"<<endl;
             test.execute(ExpectSegment{}.with_payload_size(3).with_data("def").with_seqno(isn + 4));
+            // cout<<"********************"<<endl;
         }
 
         {
+            // cout<<"********************"<<endl;
             TCPConfig cfg;
             WrappingInt32 isn(rd());
             const size_t rto = uniform_int_distribution<uint16_t>{30, 10000}(rd);
@@ -103,17 +118,24 @@ int main() {
             test.execute(WriteBytes("def"));
             test.execute(ExpectSegment{}.with_payload_size(3).with_data("def").with_seqno(isn + 4));
             test.execute(AckReceived{WrappingInt32{isn + 1}}.with_win(1000));
+            // cout<<"********************"<<endl;
             test.execute(Tick{6});
+            // cout<<"********************"<<endl;
             test.execute(ExpectSegment{}.with_payload_size(3).with_data("abc").with_seqno(isn + 1));
+            // cout<<"********************"<<endl;
             test.execute(ExpectNoSegment{});
+            // cout<<"********************"<<endl;
             test.execute(Tick{rto * 2 - 5});
+            // cout<<"********************"<<endl;
             test.execute(ExpectNoSegment{});
+            // cout<<"********************"<<endl;
             test.execute(Tick{8});
             test.execute(ExpectSegment{}.with_payload_size(3).with_data("abc").with_seqno(isn + 1));
             test.execute(ExpectNoSegment{});
         }
 
         {
+            // cout<<"********************"<<endl;
             TCPConfig cfg;
             WrappingInt32 isn(rd());
             const size_t rto = uniform_int_distribution<uint16_t>{30, 10000}(rd);
@@ -149,6 +171,7 @@ int main() {
             test.execute(ExpectSegment{}.with_payload_size(3).with_data("def").with_seqno(isn + 4));
             test.execute(ExpectNoSegment{});
         }
+// cout<<"********************"<<endl;
         {
             TCPConfig cfg;
             WrappingInt32 isn(rd());
@@ -159,7 +182,8 @@ int main() {
             for (unsigned int i = 0; i < TCPConfig::DEFAULT_CAPACITY; i++) {
                 bigstring.push_back(nicechars.at(rd() % nicechars.size()));
             }
-
+            // cout<<bigstring<<endl;
+            // cout<<bigstring.size()<<"====="<<endl;
             const size_t window_size = uniform_int_distribution<uint16_t>{50000, 63000}(rd);
 
             TCPSenderTestHarness test{"fill_window() correctly fills a big window", cfg};
@@ -167,18 +191,21 @@ int main() {
             test.execute(ExpectSegment{}.with_no_flags().with_syn(true).with_payload_size(0).with_seqno(isn));
             test.execute(AckReceived{WrappingInt32{isn + 1}}.with_win(window_size));
             test.execute(ExpectState{TCPSenderStateSummary::SYN_ACKED});
-
+            // cout<<"********************"<<endl;
             for (unsigned int i = 0; i + TCPConfig::MAX_PAYLOAD_SIZE < min(bigstring.size(), window_size);
                  i += TCPConfig::MAX_PAYLOAD_SIZE) {
+                    // cout<<i<<"??"<<endl;
                 const size_t expected_size = min(TCPConfig::MAX_PAYLOAD_SIZE, min(bigstring.size(), window_size) - i);
+                // cout<<expected_size<<endl;
                 test.execute(ExpectSegment{}
                                  .with_no_flags()
                                  .with_payload_size(expected_size)
                                  .with_data(bigstring.substr(i, expected_size))
                                  .with_seqno(isn + 1 + i));
             }
+            // cout<<"********************"<<endl;
         }
-
+// cout<<"********************"<<endl;
         {
             TCPConfig cfg;
             WrappingInt32 isn(rd());
@@ -197,14 +224,14 @@ int main() {
             test.execute(Tick{2});
             test.execute(ExpectSegment{}.with_payload_size(3).with_data("abc").with_seqno(isn + 1).with_fin(true));
         }
-
+// cout<<"********************"<<endl;
         {
             TCPConfig cfg;
             WrappingInt32 isn(rd());
             const size_t rto = uniform_int_distribution<uint16_t>{30, 10000}(rd);
             cfg.fixed_isn = isn;
             cfg.rt_timeout = rto;
-
+// cout<<"********************"<<endl;
             TCPSenderTestHarness test{"Retransmit a FIN-only segment same as any other", cfg};
             test.execute(ExpectSegment{}.with_no_flags().with_syn(true).with_payload_size(0).with_seqno(isn));
             test.execute(AckReceived{WrappingInt32{isn + 1}}.with_win(1000));
@@ -225,7 +252,7 @@ int main() {
             test.execute(Tick{10});
             test.execute(ExpectSegment{}.with_payload_size(0).with_seqno(isn + 4).with_fin(true));
         }
-
+        // cout<<"********************"<<endl;
         {
             TCPConfig cfg;
             WrappingInt32 isn(rd());
@@ -240,13 +267,17 @@ int main() {
             test.execute(ExpectState{TCPSenderStateSummary::SYN_ACKED});
             test.execute(ExpectSegment{}.with_payload_size(3).with_data("abc").with_seqno(isn + 1).with_no_flags());
             test.execute(AckReceived{WrappingInt32{isn + 2}}.with_win(2));
+            // cout<<"********************"<<endl;
             test.execute(ExpectNoSegment{});
+            // cout<<"********************"<<endl;
             test.execute(AckReceived{WrappingInt32{isn + 3}}.with_win(1));
+            // cout<<"********************"<<endl;
             test.execute(ExpectNoSegment{});
+            // cout<<"********************"<<endl;
             test.execute(AckReceived{WrappingInt32{isn + 4}}.with_win(1));
             test.execute(ExpectSegment{}.with_payload_size(0).with_seqno(isn + 4).with_fin(true));
         }
-
+// cout<<"********************"<<endl;
         {
             TCPConfig cfg;
             WrappingInt32 isn(rd());
@@ -270,7 +301,7 @@ int main() {
             test.execute(AckReceived{WrappingInt32{isn + 4}}.with_win(1));
             test.execute(ExpectSegment{}.with_payload_size(0).with_seqno(isn + 4).with_fin(true));
         }
-
+// cout<<"********************"<<endl;
         {
             TCPConfig cfg;
             WrappingInt32 isn(rd());
@@ -294,10 +325,10 @@ int main() {
                              .with_seqno(isn + 1)
                              .with_fin(true));
             test.execute(ExpectState{TCPSenderStateSummary::FIN_SENT});
-            test.execute(AckReceived(isn + 2 + TCPConfig::MAX_PAYLOAD_SIZE));
+            test.execute(AckReceived(WrappingInt32(isn.raw_value() + TCPConfig::MAX_PAYLOAD_SIZE+2)));
             test.execute(ExpectState{TCPSenderStateSummary::FIN_ACKED});
         }
-
+// cout<<"********************"<<endl;
         {
             TCPConfig cfg;
             WrappingInt32 isn(rd());
@@ -315,14 +346,14 @@ int main() {
             test.execute(ExpectSegment{}.with_payload_size(1).with_data("a").with_seqno(isn + 1).with_no_flags());
             test.execute(Close{});
             test.execute(ExpectNoSegment{});
-
+// cout<<"********************"<<endl;
             for (unsigned int i = 0; i < 5; i++) {
                 test.execute(Tick{rto - 1});
                 test.execute(ExpectNoSegment{});
                 test.execute(Tick{1});
                 test.execute(ExpectSegment{}.with_payload_size(1).with_data("a").with_seqno(isn + 1).with_no_flags());
             }
-
+// cout<<"********************"<<endl;
             test.execute(AckReceived{isn + 2}.with_win(0));
             test.execute(ExpectSegment{}.with_payload_size(1).with_data("b").with_seqno(isn + 2).with_no_flags());
 
@@ -332,7 +363,7 @@ int main() {
                 test.execute(Tick{1});
                 test.execute(ExpectSegment{}.with_payload_size(1).with_data("b").with_seqno(isn + 2).with_no_flags());
             }
-
+// cout<<"********************"<<endl;
             test.execute(AckReceived{isn + 3}.with_win(0));
             test.execute(ExpectSegment{}.with_payload_size(1).with_data("c").with_seqno(isn + 3).with_no_flags());
 
@@ -342,7 +373,7 @@ int main() {
                 test.execute(Tick{1});
                 test.execute(ExpectSegment{}.with_payload_size(1).with_data("c").with_seqno(isn + 3).with_no_flags());
             }
-
+// cout<<"********************"<<endl;
             test.execute(AckReceived{isn + 4}.with_win(0));
             test.execute(ExpectSegment{}.with_payload_size(0).with_data("").with_seqno(isn + 4).with_fin(true));
 
@@ -353,7 +384,7 @@ int main() {
                 test.execute(ExpectSegment{}.with_payload_size(0).with_data("").with_seqno(isn + 4).with_fin(true));
             }
         }
-
+// cout<<"********************"<<endl;
         {
             TCPConfig cfg;
             WrappingInt32 isn(rd());

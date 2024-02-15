@@ -21,6 +21,7 @@ using namespace std;
 void TCPReceiver::segment_received(const TCPSegment &seg) {
     // cout<<seg.header().seqno<<" "<<seg.header().syn<<" "<<seg.header().fin<<" "<<endl;
     // cout<<_isn.has_value()<<" "<<seg.header().syn<<" "<<seg.header().seqno<<" "<<seg.payload().copy()<<endl;
+    // cout<<"syn="<<seg.header().syn<<" payload="<<seg.payload().copy()<<endl;
     if(!_isn.has_value()){
         if(seg.header().syn==true){
             _isn=WrappingInt32(seg.header().seqno);
