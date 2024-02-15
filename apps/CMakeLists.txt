@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 add_library (stream_copy STATIC bidirectional_stream_copy.cc)
 
 add_sponge_exec (udp_tcpdump ${LIBPCAP})
