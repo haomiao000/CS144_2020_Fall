@@ -77,6 +77,7 @@ void TCPSender::fill_window() {
         //_next_seqno
         (seg.header().syn) ? (_next_seqno+=1) : (_next_seqno+=fill_sz);
         (seg.header().fin) ? (_next_seqno+=1) : (_next_seqno);
+        // cout<<"_window_size="<<_window_size<<"  _window_size-bytes_flight="<<_window_size-bytes_flight<<endl;
         if(_window_size==0||_window_size-bytes_flight<=0||_fin) break;
     }
 }
@@ -112,7 +113,7 @@ void TCPSender::tick(const size_t ms_since_last_tick) {
     // cout<<"tickstart_with_ms="<<_ms_total_tick<<"!!!!!!!!!!!!!!!!!!!!!_retransmission_timeout="<<_retransmission_timeout<<endl;
     // size_t cnt=_ms_total_tick;
     _ms_total_tick+=ms_since_last_tick;
-    // cout<<"tickstart_with_ms="<<_ms_total_tick<<"!!!!!!!!!!!!!!!!!!!!!"<<endl;
+    // cout<<"tickstart_with_ms="<<_ms_total_tick<<"  and _retransmission_timeout="<<_retransmission_timeout<<" _outgoing_seg size="<<_outgoing_seg.size()<<endl;
     if(_ms_total_tick>=_retransmission_timeout){
         if(!_outgoing_seg.empty()){
             _segments_out.push(_outgoing_seg[0]);
@@ -120,6 +121,9 @@ void TCPSender::tick(const size_t ms_since_last_tick) {
             // cout<<"ticksend-------_ms_total_tick="<<cnt<<" _retransmission_timeout="<<_retransmission_timeout<<" ms_since_last_tick="<<ms_since_last_tick<<" zerowindow="<<if_zero_window<<endl;
             // cout<<"ticksend-------isn="<<_isn<<" window_sz="<<_window_size<<" out_seg="<<_outgoing_seg.size()<<" ack="<<_ackno_now<<" stream_sz="<<_stream.buffer_size()<<" outque_sz="<<_segments_out.size()<<endl;
             // cout<<"ticksend-------syn="<<seg.header().syn<<" fin="<<seg.header().fin<<" seqno="<<seg.header().seqno.raw_value()<<" payload="<<seg.payload().copy()<<endl;
+        }else {
+            _ms_total_tick=0;
+            return;
         }
         if(!if_zero_window){
             _ms_total_tick=0;
@@ -134,6 +138,6 @@ unsigned int TCPSender::consecutive_retransmissions() const {return _consecutive
 
 void TCPSender::send_empty_segment() {
     TCPSegment seg;
-    seg.header().seqno=_isn;
+    seg.header().seqno=wrap(_next_seqno , _isn);
     _segments_out.push(seg);
 }

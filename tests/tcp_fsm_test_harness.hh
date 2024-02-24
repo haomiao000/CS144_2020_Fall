@@ -187,6 +187,11 @@ class TCPTestHarness {
     //!            seqno for the SYN.
     //! \param[in] rx_isn is the ISN of the FSM's inbound sequence. i.e. the
     //!            seqno for the SYN.
+    //! \brief 在TIME_WAIT状态下创建一个有限状态机（FSM）
+    //! \details 已经交换了SYN，然后TCP发送了FIN，接着收到了FIN/ACK，然后进行了ACK。
+    //!          没有交换有效负载。
+    //! \param[in] tx_isn 是FSM出站序列的初始序列号。即SYN的序列号。
+    //! \param[in] rx_isn 是FSM入站序列的初始序列号。即SYN的序列号。
     static TCPTestHarness in_time_wait(const TCPConfig &cfg,
                                        const WrappingInt32 tx_isn = WrappingInt32{0},
                                        const WrappingInt32 rx_isn = WrappingInt32{0});

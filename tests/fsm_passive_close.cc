@@ -15,6 +15,7 @@ using State = TCPTestHarness::State;
 
 int main() {
     try {
+        // int count=0;
         TCPConfig cfg{};
 
         // test #1: start in LAST_ACK, ack
@@ -29,10 +30,12 @@ int main() {
             test_1.execute(Tick(1));
 
             test_1.execute(ExpectState{State::CLOSED});
+            // cout<<"test #"<<++count<<" running accept"<<endl;
         }
 
         // test #2: start in CLOSE_WAIT, close(), throw away first FIN, ack re-tx FIN
         {
+            
             TCPTestHarness test_2 = TCPTestHarness::in_close_wait(cfg);
 
             test_2.execute(Tick(4 * cfg.rt_timeout));
@@ -66,6 +69,7 @@ int main() {
             test_2.execute(Tick(1));
 
             test_2.execute(ExpectState{State::CLOSED});
+            // cout<<"test #"<<++count<<" running accept"<<endl;
         }
 
         // test #3: start in ESTABLSHED, send FIN, recv ACK, check for CLOSE_WAIT
@@ -106,6 +110,7 @@ int main() {
             test_3.execute(Tick(1));
 
             test_3.execute(ExpectState{State::CLOSED});
+            // cout<<"test #"<<++count<<" running accept"<<endl;
         }
     } catch (const exception &e) {
         cerr << e.what() << endl;

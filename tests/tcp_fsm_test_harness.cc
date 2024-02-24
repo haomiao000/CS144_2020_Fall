@@ -143,19 +143,25 @@ void TCPTestHarness::send_data(const WrappingInt32 seqno, const WrappingInt32 ac
 
 void TCPTestHarness::execute(const TCPTestStep &step, std::string note) {
     try {
+        // cout<<"here 1"<<endl;
         step.execute(*this);
+        // cout<<"here 2"<<endl;
         while (not _fsm.segments_out().empty()) {
             _flt.write(_fsm.segments_out().front());
             _fsm.segments_out().pop();
         }
+        // cout<<"here 3"<<endl;
         _steps_executed.emplace_back(step.to_string());
+        // cout<<"here 4"<<endl;
     } catch (const TCPExpectationViolation &e) {
+        // cout<<"here 5"<<endl;
         cerr << "Test Failure on expectation:\n\t" << step.to_string();
         cerr << "\n\nFailure message:\n\t" << e.what();
         cerr << "\n\nList of steps that executed successfully:";
         for (const string &s : _steps_executed) {
             cerr << "\n\t" << s;
         }
+        // cout<<"here 6"<<endl;
         cerr << endl << endl;
         if (note.size() > 0) {
             cerr << "Note:\n\t" << note << endl << endl;
@@ -196,9 +202,12 @@ TCPTestHarness TCPTestHarness::in_listen(const TCPConfig &cfg) {
 //!            seqno for the SYN.
 TCPTestHarness TCPTestHarness::in_syn_sent(const TCPConfig &cfg, const WrappingInt32 tx_isn) {
     TCPConfig c{cfg};
+    // cout<<"11"<<endl;
     c.fixed_isn = tx_isn;
     TCPTestHarness h{c};
+    // cout<<"22"<<endl;
     h.execute(Connect{});
+    // cout<<"33"<<endl;
     h.execute(ExpectOneSegment{}.with_no_flags().with_syn(true).with_seqno(tx_isn).with_payload_size(0));
     return h;
 }
@@ -212,10 +221,13 @@ TCPTestHarness TCPTestHarness::in_syn_sent(const TCPConfig &cfg, const WrappingI
 TCPTestHarness TCPTestHarness::in_established(const TCPConfig &cfg,
                                               const WrappingInt32 tx_isn,
                                               const WrappingInt32 rx_isn) {
+                                                // cout<<0<<endl;
     TCPTestHarness h = in_syn_sent(cfg, tx_isn);
     // It has sent a SYN with nothing else, and that SYN has been consumed
     // We reply with ACK and SYN.
+    // cout<<1<<endl;
     h.send_syn(rx_isn, tx_isn + 1);
+    // cout<<2<<endl;
     h.execute(ExpectOneSegment{}.with_no_flags().with_ack(true).with_ackno(rx_isn + 1).with_payload_size(0));
     return h;
 }
@@ -261,8 +273,11 @@ TCPTestHarness TCPTestHarness::in_last_ack(const TCPConfig &cfg,
 TCPTestHarness TCPTestHarness::in_fin_wait_1(const TCPConfig &cfg,
                                              const WrappingInt32 tx_isn,
                                              const WrappingInt32 rx_isn) {
+    // cout<<0<<endl;
     TCPTestHarness h = in_established(cfg, tx_isn, rx_isn);
+    // cout<<1<<endl;
     h.execute(Close{});
+    // cout<<2<<endl;
     h.execute(
         ExpectOneSegment{}.with_no_flags().with_fin(true).with_ack(true).with_ackno(rx_isn + 1).with_seqno(tx_isn + 1));
     return h;
@@ -306,11 +321,19 @@ TCPTestHarness TCPTestHarness::in_closing(const TCPConfig &cfg,
 //!            seqno for the SYN.
 //! \param[in] rx_isn is the ISN of the FSM's inbound sequence. i.e. the
 //!            seqno for the SYN.
+//! \brief 在TIME_WAIT状态下创建一个FSM
+//! \details 已经交换了SYN，然后TCP发送了FIN，接着收到了FIN/ACK，并发送了ACK。
+//!          没有进行有效的数据交换。
+//! \param[in] tx_isn 是FSM的出站序列号（outbound sequence）即SYN的序列号。
+//! \param[in] rx_isn 是FSM的入站序列号（inbound sequence）即SYN的序列号。
 TCPTestHarness TCPTestHarness::in_time_wait(const TCPConfig &cfg,
                                             const WrappingInt32 tx_isn,
                                             const WrappingInt32 rx_isn) {
+    // cout<<0<<endl;
     TCPTestHarness h = in_fin_wait_1(cfg, tx_isn, rx_isn);
+    // cout<<1<<endl;
     h.send_fin(rx_isn + 1, tx_isn + 2);
+    // cout<<2<<endl;
     h.execute(ExpectOneSegment{}.with_no_flags().with_ack(true).with_ackno(rx_isn + 2));
     return h;
 }

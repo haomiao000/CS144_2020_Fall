@@ -31,7 +31,9 @@ int main() {
         cfg.send_capacity = MAX_SWIN * MAX_SWIN_MUL;
 
         // test 1: listen -> established -> check advertised winsize -> check sent bytes before ACK
+        // cout<<"NREPS="<<NREPS<<endl;
         for (unsigned rep_no = 0; rep_no < NREPS; ++rep_no) {
+            // cout<<"rep_no="<<rep_no<<endl;
             cfg.recv_capacity = 2048 + (rd() % 32768);
             const WrappingInt32 seq_base(rd());
             TCPTestHarness test_1(cfg);
@@ -84,6 +86,7 @@ int main() {
                 // NOTE that we don't override send window here because cfg should have been updated
                 test_1.send_ack(seq_base + 1, ack_base + 1 + bytes_total, swin);
                 test_1.execute(Tick(1));
+                // cout<<"bytes_total="<<bytes_total<<" swin_mul * swin="<<swin_mul * swin<<endl;
             }
             test_1.execute(ExpectBytesInFlight{0}, "test 1 failed: after acking, bytes still in flight?");
             test_err_if(!equal(d.cbegin(), d.cend(), d_out.cbegin()), "test 1 failed: data mismatch");

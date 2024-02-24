@@ -16,7 +16,8 @@
 //! segments, keeps track of which segments are still in-flight,
 //! maintains the Retransmission Timer, and retransmits in-flight
 //! segments if the retransmission timer expires.
-//! 接受一个ByteStream，将其分割为段并发送这些段，跟踪仍在传输但尚未被确认的段，维护重传定时器，并在重传定时器到期时重新传输仍在传输中的段。
+//! 接受一个ByteStream，将其分割为段并发送这些段，跟踪仍在传输但尚未被确认的段，
+//! 维护重传定时器，并在重传定时器到期时重新传输仍在传输中的段。
 class TCPSender {
   private:
     //! our initial sequence number, the number for our SYN.
@@ -135,6 +136,7 @@ class TCPSender {
     //! \brief 下一个要发送的字节的相对序列号
     WrappingInt32 next_seqno() const { return wrap(_next_seqno, _isn); }
     //!@}
+    
 };
 
 #endif  // SPONGE_LIBSPONGE_TCP_SENDER_HH

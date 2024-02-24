@@ -50,6 +50,7 @@ static void ack_rst_syn_sent_test(const TCPConfig &cfg,
 
 int main() {
     try {
+        // int count=0;
         TCPConfig cfg{};
         const WrappingInt32 base_seq(1 << 31);
 
@@ -98,6 +99,7 @@ int main() {
 
             test_1.send_rst(base_seq + 1);
             test_1.execute(ExpectState{State::RESET});
+            // cout<<"test #"<<++count<<" accept"<<endl;
         }
 
         // test #2: in LISTEN, send RSTs
@@ -111,6 +113,7 @@ int main() {
             test_2.send_rst(base_seq + cfg.recv_capacity);
 
             test_2.execute(ExpectNoSegment{}, "test 2 failed: RST was not ignored in LISTEN");
+            // cout<<"test #"<<++count<<" accept"<<endl;
         }
 
         // test 3: ACKs in LISTEN
@@ -124,6 +127,7 @@ int main() {
         ack_listen_test(cfg, base_seq, base_seq + cfg.recv_capacity, __LINE__);
         ack_listen_test(cfg, base_seq + cfg.recv_capacity, base_seq, __LINE__);
         ack_listen_test(cfg, base_seq + cfg.recv_capacity, base_seq + cfg.recv_capacity, __LINE__);
+        // cout<<"test #"<<++count<<" accept"<<endl;
 
         // test 4: ACK and RST in SYN_SENT
         {
@@ -136,11 +140,13 @@ int main() {
             test_4.execute(ExpectState{State::RESET});
             test_4.execute(ExpectNoSegment{}, "test 4 failed: RST with good ackno should RESET the connection");
         }
+        // cout<<"test #"<<++count<<" accept"<<endl;
 
         // test 5: ack/rst in SYN_SENT
         cerr << "Test 5" << endl;
         ack_rst_syn_sent_test(cfg, base_seq, base_seq, base_seq, __LINE__);
         ack_rst_syn_sent_test(cfg, base_seq, base_seq, base_seq + 2, __LINE__);
+        // cout<<"test #"<<++count<<" accept"<<endl;
     } catch (const exception &e) {
         cerr << e.what() << endl;
         return EXIT_FAILURE;

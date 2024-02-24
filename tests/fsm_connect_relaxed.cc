@@ -41,10 +41,12 @@ int main() {
             test_1.execute(ExpectOneSegment{}.with_ack(true).with_syn(false).with_ackno(isn + 1));
 
             test_1.execute(ExpectBytesInFlight{0UL});
+            // cout<<"test #1 accepted"<<"!!!!!!!!!!!!"<<endl;
         }
 
         // test #2: START -> SYN_SENT -> SYN -> ACK -> ESTABLISHED
         {
+            // cout<<"test #2 started"<<"!!!!!!!!!!!!"<<endl;
             TCPTestHarness test_2(cfg);
 
             test_2.execute(Connect{});
@@ -60,10 +62,8 @@ int main() {
             const WrappingInt32 isn(rd());
             test_2.send_syn(isn);
             test_2.execute(Tick(1));
-
             test_2.expect_seg(ExpectOneSegment{}.with_syn(false).with_ack(true).with_ackno(isn + 1),
                               "test 2 failed: bad ACK for SYN");
-
             test_2.execute(ExpectState{State::SYN_RCVD});
 
             // now send ACK
@@ -71,6 +71,7 @@ int main() {
             test_2.execute(Tick(1));
             test_2.execute(ExpectNoSegment{}, "test 2 failed: got spurious ACK after ACKing SYN");
             test_2.execute(ExpectState{State::ESTABLISHED});
+            // cout<<"test #2 accepted"<<"!!!!!!!!!!!!"<<endl;
         }
 
         // test #3: START -> SYN_SENT -> SYN/ACK -> ESTABLISHED
@@ -95,6 +96,7 @@ int main() {
                            "test 3 failed: bad ACK for SYN");
 
             test_3.execute(ExpectState{State::ESTABLISHED});
+            // cout<<"test #3 accepted"<<"!!!!!!!!!!!!"<<endl;
         }
     } catch (const exception &e) {
         cerr << e.what() << endl;

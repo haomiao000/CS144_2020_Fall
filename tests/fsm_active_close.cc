@@ -3,7 +3,8 @@
 #include "tcp_fsm_test_harness.hh"
 #include "tcp_header.hh"
 #include "tcp_segment.hh"
-
+#define GRN "!!!!!"
+#define GRNED "!!!!!"
 #include <cstdlib>
 #include <exception>
 #include <iostream>
@@ -14,26 +15,29 @@ using namespace std;
 using State = TCPTestHarness::State;
 
 int main() {
+    // size_t op=0;
     try {
         TCPConfig cfg{};
-
+        // cout<<GRN<< "here i start"<<GRNED<<endl;
         // test #1: start in TIME_WAIT, timeout
         {
+            // size_t step=0;
+            // cout<<GRN<<"running on step  "<<++step<<"   "<<GRNED<<endl;
             TCPTestHarness test_1 = TCPTestHarness::in_time_wait(cfg);
-
+            // cout<<GRN<<"running on step  "<<++step<<"   "<<GRNED<<endl;
             test_1.execute(Tick(10 * cfg.rt_timeout - 1));
-
+            // cout<<GRN<<"running on step  "<<++step<<"   "<<GRNED<<endl;
             test_1.execute(ExpectState{State::TIME_WAIT});
-
+            // cout<<GRN<<"running on step  "<<++step<<"   "<<GRNED<<endl;
             test_1.execute(Tick(1));
-
+            // cout<<GRN<<"running on step  "<<++step<<"   "<<GRNED<<endl;
             test_1.execute(ExpectNotInState{State::TIME_WAIT});
-
+            // cout<<GRN<<"running on step  "<<++step<<"   "<<GRNED<<endl;
             test_1.execute(Tick(10 * cfg.rt_timeout));
-
+            // cout<<GRN<<"running on step  "<<++step<<"   "<<GRNED<<endl;
             test_1.execute(ExpectState{State::CLOSED});
         }
-
+        // cout<<GRN<<"test  "<<++op<<"  passed"<<GRNED<<endl;
         // test #2: start in CLOSING, send ack, time out
         {
             TCPTestHarness test_2 = TCPTestHarness::in_closing(cfg);
@@ -55,7 +59,7 @@ int main() {
 
             test_2.execute(ExpectState{State::CLOSED});
         }
-
+        // cout<<GRN<<"test  "<<++op<<"  passed"<<GRNED<<endl;
         // test #3: start in FIN_WAIT_2, send FIN, time out
         {
             TCPTestHarness test_3 = TCPTestHarness::in_fin_wait_2(cfg);
@@ -78,7 +82,7 @@ int main() {
 
             test_3.execute(ExpectState{State::CLOSED});
         }
-
+        // cout<<GRN<<"test  "<<++op<<"  passed"<<GRNED<<endl;
         // test #4: start in FIN_WAIT_1, ack, FIN, time out
         {
             TCPTestHarness test_4 = TCPTestHarness::in_fin_wait_1(cfg);
@@ -103,7 +107,7 @@ int main() {
 
             test_4.execute(ExpectState{State::CLOSED});
         }
-
+        // cout<<GRN<<"test  "<<++op<<"  passed"<<GRNED<<endl;
         // test 5: start in FIN_WAIT_1, ack, FIN, FIN again, time out
         {
             TCPTestHarness test_5 = TCPTestHarness::in_fin_wait_1(cfg);
@@ -146,7 +150,7 @@ int main() {
             test_5.execute(Tick(10));
             test_5.execute(ExpectState{State::CLOSED});
         }
-
+        // cout<<GRN<<"test  "<<++op<<"  passed"<<GRNED<<endl;
         // test 6: start in ESTABLISHED, get FIN, get FIN re-tx, send FIN, get ACK, send ACK, time out
         {
             TCPTestHarness test_6 = TCPTestHarness::in_established(cfg);
@@ -188,6 +192,7 @@ int main() {
 
             test_6.execute(ExpectState{State::CLOSED});
         }
+        // cout<<GRN<<"test  "<<++op<<"  passed"<<GRNED<<endl;
     } catch (const exception &e) {
         cerr << e.what() << endl;
         return EXIT_FAILURE;
