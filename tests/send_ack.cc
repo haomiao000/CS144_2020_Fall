@@ -51,6 +51,23 @@ int main() {
             test.execute(AckReceived{WrappingInt32{isn + 1}});
             test.execute(ExpectNoSegment{});
         }
+        // cout<<"************"<<endl;
+        // credit for test: Jared Wasserman (2020)
+        {
+            TCPConfig cfg;
+            WrappingInt32 isn(rd());
+            cfg.fixed_isn = isn;
+            // cout<<"************"<<endl;
+            TCPSenderTestHarness test{"Impossible ackno (beyond next seqno) is ignored", cfg};
+            // cout<<"************"<<endl;
+            test.execute(ExpectState{TCPSenderStateSummary::SYN_SENT});
+            // cout<<"************"<<endl;
+            test.execute(ExpectSegment{}.with_no_flags().with_syn(true).with_payload_size(0).with_seqno(isn));
+            test.execute(AckReceived{WrappingInt32{isn + 2}}.with_win(1000));
+            // cout<<"************"<<endl;
+            test.execute(ExpectState{TCPSenderStateSummary::SYN_SENT});
+            // cout<<"************"<<endl;
+        }
 
         /* remove requirement to send corrective ACK for bad ACK
             {

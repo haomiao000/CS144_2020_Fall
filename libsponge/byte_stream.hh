@@ -2,7 +2,7 @@
 #define SPONGE_LIBSPONGE_BYTE_STREAM_HH
 
 #include <string>
-#include<queue>
+#include <deque>
 
 //! \brief An in-order byte stream.
 
