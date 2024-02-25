@@ -37,16 +37,15 @@ size_t ByteStream::write(const string &data) {
 //! \param[in] len bytes will be copied from the output side of the buffer
 string ByteStream::peek_output(const size_t len) const {
     // cout<<"here!!!!!!!!!!!"<<endl;
-    if(_byte_stream.empty()) return "";
-    size_t sz=_byte_stream.size();
-    string subs="";
-    size_t tag=min(sz , len);
-    for(size_t i=tag-1;i!=SIZE_MAX;i--){
-        subs.push_back(_byte_stream[i]);
+    string ans;
+    size_t limit = buffer_size();
+    size_t tmp = min(limit, len);
+    int cnt = limit - tmp;
+    for (int i = limit - 1; i >= cnt; i--){
+        ans += _byte_stream[i];
     }
-    return subs;
+    return ans;
 }
-
 //! \param[in] len bytes will be removed from the output side of the buffer
 void ByteStream::pop_output(const size_t len) { 
     // cout<<"here!!!!!!!!!!!"<<endl;
@@ -63,14 +62,8 @@ void ByteStream::pop_output(const size_t len) {
 std::string ByteStream::read(const size_t len) {
     // cout<<"here!!!!!!!!!!!"<<endl;
 
-    size_t sz=_byte_stream.size();
-    string subs="";
-    for(size_t i=1;i<=min(sz , len);i++){
-        _byte_read_num++;
-        subs.push_back(_byte_stream.back());
-        _byte_stream.pop_back();
-    }
-    // cout<<_byte_read_num<<"-----------"<<endl;
+    string subs=peek_output(len);
+    pop_output(subs.length());
     return subs;
 }
 
