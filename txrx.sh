@@ -163,6 +163,7 @@ exit_cleanup () {
 ip link show tun144 &>/dev/null || { echo "please enable tun144 and re-run"; exit 1; }
 ip link show tun145 &>/dev/null || { echo "please enable tun145 and re-run"; exit 1; }
 
+
 set -u
 trap exit_cleanup EXIT
 
@@ -225,11 +226,11 @@ case "$RSDMODE" in
         HASH_OUT2=$(hash_file "${TEST_OUT2_FILE}")
         ;;
 esac
+
 if ! wait; then
     echo ERROR: subprocess failed
     exit 1
 fi
-
 HASH_OUT=$(hash_file ${TEST_OUT_FILE})
 if [ ! -z "${HASH_OUT2}" ] && [ "${HASH_OUT}" != "${HASH_OUT2}" ] || [ "${HASH_IN}" != "${HASH_OUT}" ]; then
     echo ERROR: "$HASH_IN" neq "$HASH_OUT" or "$HASH_OUT2"
