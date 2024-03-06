@@ -15,7 +15,7 @@ class ByteStream {
     std::deque<char> _byte_stream;
     size_t _byte_read_num;
     size_t _byte_write_num;
-    bool _byte_read_end;
+    bool _byte_write_end;
     bool _error{};  //!< Flag indicating that the stream suffered an error.
   public:
     //! Construct a stream with room for `capacity` bytes.

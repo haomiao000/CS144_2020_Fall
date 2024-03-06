@@ -19,7 +19,7 @@ ByteStream::ByteStream(const size_t capacity) :
     _byte_stream(), 
     _byte_read_num(0),
     _byte_write_num(0),
-    _byte_read_end(false),
+    _byte_write_end(false),
     _error(false) {
 }
 size_t ByteStream::write(const string &data) {
@@ -67,16 +67,16 @@ std::string ByteStream::read(const size_t len) {
     return subs;
 }
 
-void ByteStream::end_input() {_byte_read_end=true;}
+void ByteStream::end_input() {_byte_write_end=true;}
 
-bool ByteStream::input_ended() const {return _byte_read_end; }
+bool ByteStream::input_ended() const {return _byte_write_end; }
 
 size_t ByteStream::buffer_size() const {return _byte_stream.size(); }
 
 bool ByteStream::buffer_empty() const {return _byte_stream.empty(); }
 
 bool ByteStream::eof() const {
-    if(_byte_stream.empty()&&_byte_read_end) return true;
+    if(_byte_stream.empty()&&_byte_write_end) return true;
     return false; 
 }
 
