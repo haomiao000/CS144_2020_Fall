@@ -98,9 +98,8 @@ void TCPConnection::set_errro(){
 //     }    
 // }
 void TCPConnection::segment_received(const TCPSegment &seg) {
-
-    // cerr<<DG<<"[segment_received]"<<"segment_received seg at time "<<time_now<<" :";debug_seg(seg);
-    // cerr<<"_active=  "<<((_active)?"true":"false")<<endl;
+    cerr<<DG<<"[segment_received]"<<"segment_received seg at time "<<time_now<<" :";debug_seg(seg);
+    cerr<<"_active=  "<<((_active)?"true":"false")<<endl;
     if(!_active){
         return;
     }
